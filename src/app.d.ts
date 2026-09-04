@@ -1,10 +1,20 @@
-import type { User, Session } from 'better-auth';
+import type { User as BetterAuthUser, Session } from 'better-auth';
+
+export interface SangriaUser extends BetterAuthUser {
+	role?: string;
+	banned?: boolean;
+	banReason?: string | null;
+	banExpires?: Date | null;
+}
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Locals { user?: User; session?: Session }
+		interface Locals {
+			user?: SangriaUser;
+			session?: Session;
+		}
 
 		// interface Error {}
 		// interface PageData {}

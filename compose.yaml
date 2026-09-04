@@ -1,14 +1,39 @@
 services:
   db:
-    image: postgres
+    image: docker.io/library/postgres:18-alpine
     restart: always
     ports:
-      - 5432:5432
-    environment: 
+      - '5432:5432'
+    environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
     volumes:
+      # Updated mount point required for PostgreSQL 18+
       - pgdata:/var/lib/postgresql
+
+  mailpit:
+    image: docker.io/axllent/mailpit:latest
+    restart: always
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    environment:
+      MP_MAX_MESSAGES: 500
+
+  minio:
+    image: docker.io/minio/minio:latest
+    restart: always
+    command: server /data --console-address ":9001"
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    volumes:
+      - miniodata:/data
+
 volumes:
   pgdata:
+  miniodata:

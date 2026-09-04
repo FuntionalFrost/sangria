@@ -1,42 +1,126 @@
-# sv
+# 🍷 Sangria
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+> **The Batteries-Included SvelteKit Framework for Solo Web Developers**  
+> Bringing the out-of-the-box productivity of **Django** and the modular DX of **Nuxt Modules** to **SvelteKit 2 + Svelte 5 Runes**.
 
-## Creating a project
+---
 
-If you're seeing this, you've probably already done this step. Congrats!
+## ✨ Features & Batteries
 
-```sh
-# create a new project
-npx sv create my-app
+- 🚀 **Auto-Introspecting `/admin`**: Instant CRUD dashboard with search, filters, sorting, pagination, and forms generated from Drizzle schemas.
+- 🛡️ **Authentication & RBAC**: Better-Auth with session cookies, social OAuth, role guards, and a 1-command `createsuperuser` CLI.
+- 🐘 **PostgreSQL 18 + Drizzle ORM**: Type-safe relational models, automated migrations, and Zod validation.
+- ⚡ **Background Jobs**: PostgreSQL-backed task queue with `pg-boss` and admin queue monitoring.
+- ✉️ **Transactional Email**: Nodemailer transport with Svelte email templates and local **Mailpit** inbox on port `8025`.
+- 🗄️ **Object Storage**: S3 & MinIO client with direct presigned uploads on port `9000` (API) and `9001` (Console).
+- 🧩 **Modular Architecture**: Nuxt-style module plugin system (`defineSangriaModule`).
+- 🦭 **Podman & Docker Ready**: Rootless container setup via `compose.yaml` and multi-stage `Containerfile`.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Start Infrastructure with Podman (or Docker)
+
+```bash
+# Start PostgreSQL 18, Mailpit (email), and MinIO (S3 storage)
+podman compose up -d
+# or: docker compose up -d
 ```
 
-To recreate this project with the same configuration:
+### 2. Push Database Schema
 
-```sh
-# recreate this project
-pnpm dlx sv@0.17.0 create --template minimal --types ts --add prettier eslint tailwindcss="plugins:typography" drizzle="database:postgresql+postgresql:postgres.js+docker:yes" better-auth="demo:password,github" ai-tools="ide:gemini+tools:mcp,svelte-code-writer,svelte-core-bestpractices,svelte-file-editor+mcpSetup:local" --install pnpm sangria
+```bash
+pnpm db:push
 ```
 
-## Developing
+### 3. Create a Superadministrator
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```bash
+pnpm sangria createsuperuser
 ```
 
-## Building
+### 4. Start Development Server
 
-To create a production version of your app:
-
-```sh
-npm run build
+```bash
+pnpm dev
 ```
 
-You can preview the production build with `npm run preview`.
+Visit:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- **Public Site**: [http://localhost:5173](http://localhost:5173)
+- **Admin Dashboard**: [http://localhost:5173/admin](http://localhost:5173/admin)
+- **Mailpit Dev Inbox**: [http://localhost:8025](http://localhost:8025)
+- **MinIO S3 Console**: [http://localhost:9001](http://localhost:9001)
+
+---
+
+## 🛠️ CLI Commands
+
+```bash
+# Create an admin account interactively
+pnpm sangria createsuperuser
+
+# Scaffold a new Drizzle model + Admin resource
+pnpm sangria make:resource <name>
+
+# Generate a new modular package
+pnpm sangria make:module <name>
+
+# Start the background task queue worker
+pnpm sangria queue:work
+```
+
+---
+
+## 📐 Defining Admin Resources
+
+```typescript
+// src/lib/server/admin/resources.ts
+import { defineResource } from '$lib/sangria';
+import { task } from '$lib/server/db/schema';
+
+export const taskResource = defineResource(task, {
+	name: 'task',
+	label: 'Tasks',
+	singularLabel: 'Task',
+	icon: 'CheckSquare',
+	group: 'Core',
+	list: {
+		columns: ['id', 'title', 'status', 'priority', 'dueDate', 'createdAt'],
+		searchable: ['title', 'description'],
+		filterable: ['status', 'priority'],
+		sortable: ['id', 'title', 'priority', 'dueDate', 'createdAt']
+	},
+	fields: {
+		id: { readonly: true },
+		description: { widget: 'textarea' },
+		status: {
+			widget: 'select',
+			options: [
+				{ label: 'To Do', value: 'todo' },
+				{ label: 'In Progress', value: 'in_progress' },
+				{ label: 'Done', value: 'done' }
+			]
+		}
+	},
+	permissions: {
+		view: (user) => true,
+		create: (user) => user?.role === 'admin' || user?.role === 'superadmin',
+		edit: (user) => user?.role === 'admin' || user?.role === 'superadmin',
+		delete: (user) => user?.role === 'superadmin'
+	}
+});
+```
+
+---
+
+## 🏗️ Production Build & Container
+
+```bash
+# Build the application
+pnpm build
+
+# Build production container image with Podman
+podman build -t sangria-app -f Containerfile .
+```
