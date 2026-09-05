@@ -2,7 +2,7 @@
 	import {
 		Database,
 		Users,
-		CheckSquare,
+		SquareCheckBig,
 		FileText,
 		Folder,
 		HardDrive,
@@ -19,7 +19,7 @@
 		ChevronLeft,
 		ChevronRight,
 		ArrowUpDown,
-		Filter,
+		Funnel,
 		X,
 		Check,
 		ExternalLink,
@@ -29,7 +29,7 @@
 		ShieldCheck,
 		Activity,
 		RefreshCw,
-		UploadCloud
+		CloudUpload
 	} from '@lucide/svelte';
 
 	let { name, class: className = 'w-4 h-4' }: { name?: string; class?: string } = $props();
@@ -37,7 +37,7 @@
 	const iconMap: Record<string, any> = {
 		Database,
 		Users,
-		CheckSquare,
+		SquareCheckBig,
 		FileText,
 		Folder,
 		HardDrive,
@@ -55,7 +55,7 @@
 		ChevronLeft,
 		ChevronRight,
 		ArrowUpDown,
-		Filter,
+		Funnel,
 		X,
 		Check,
 		ExternalLink,
@@ -65,7 +65,7 @@
 		ShieldCheck,
 		Activity,
 		RefreshCw,
-		UploadCloud
+		CloudUpload
 	};
 
 	const IconComponent = $derived(iconMap[name || 'Database'] || Database);

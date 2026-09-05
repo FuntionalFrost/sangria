@@ -7,7 +7,8 @@ import {
 	fetchResourceItem,
 	createResourceItem,
 	updateResourceItem,
-	deleteResourceItem
+	deleteResourceItem,
+	type FieldConfig
 } from '$lib/sangria';
 import '$lib/server/admin/resources';
 
@@ -31,7 +32,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!isNew && !item) throw error(404, 'Record not found');
 
 	// Populate relational options for fields referencing another resource
-	const resolvedFields = JSON.parse(JSON.stringify(resource.fields));
+	const resolvedFields: Record<string, FieldConfig> = JSON.parse(JSON.stringify(resource.fields));
 	for (const [fieldName, fieldConfig] of Object.entries(resource.fields)) {
 		if (fieldConfig.referencesResource) {
 			const targetResource = registry.getResource(fieldConfig.referencesResource);

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import AdminIcon from '$lib/components/admin/AdminIcon.svelte';
+	import type { FieldConfig } from '$lib/sangria';
 
 	let { data, form } = $props();
 	let saving = $state(false);
 
-	function formatInputValue(val: unknown, fieldConfig: any): string {
+	function formatInputValue(val: unknown, fieldConfig: FieldConfig): string {
 		if (val === null || val === undefined) return '';
 		if (fieldConfig.dataType === 'date' && val) {
 			const d = new Date(val as any);
@@ -92,7 +93,8 @@
 		}}
 		class="space-y-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
 	>
-		{#each Object.entries(data.resource.fields) as [fieldName, field] (fieldName)}
+		{#each Object.entries(data.resource.fields) as [fieldName, rawField] (fieldName)}
+			{@const field = rawField as FieldConfig}
 			{#if !field.hidden}
 				{@const currentValue = data.item[fieldName]}
 				<div>

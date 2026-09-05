@@ -1,6 +1,12 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { registry, fetchResourceList, deleteResourceItem, bulkDeleteResourceItems } from '$lib/sangria';
+import {
+	registry,
+	fetchResourceList,
+	deleteResourceItem,
+	bulkDeleteResourceItems,
+	type PaginatedResult
+} from '$lib/sangria';
 import '$lib/server/admin/resources';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
@@ -32,7 +38,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 		}
 	}
 
-	let result = { items: [], total: 0, page: 1, perPage: 20, totalPages: 1 };
+	let result: PaginatedResult = { items: [], total: 0, page: 1, perPage: 20, totalPages: 1 };
 	let dbError: string | null = null;
 
 	try {

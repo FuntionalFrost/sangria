@@ -7,7 +7,7 @@
 
 ## ✨ Features & Batteries
 
-- 🚀 **Auto-Introspecting `/admin`**: Instant CRUD dashboard with search, filters, sorting, pagination, and forms generated from Drizzle schemas.
+- 🚀 **Auto-Introspecting `/admin`**: Instant CRUD dashboard with search, Funnels, sorting, pagination, and forms generated from Drizzle schemas.
 - 🛡️ **Authentication & RBAC**: Better-Auth with session cookies, social OAuth, role guards, and a 1-command `createsuperuser` CLI.
 - 🐘 **PostgreSQL 18 + Drizzle ORM**: Type-safe relational models, automated migrations, and Zod validation.
 - ⚡ **Background Jobs**: PostgreSQL-backed task queue with `pg-boss` and admin queue monitoring.
@@ -84,12 +84,12 @@ export const taskResource = defineResource(task, {
 	name: 'task',
 	label: 'Tasks',
 	singularLabel: 'Task',
-	icon: 'CheckSquare',
+	icon: 'SquareCheckBig',
 	group: 'Core',
 	list: {
 		columns: ['id', 'title', 'status', 'priority', 'dueDate', 'createdAt'],
 		searchable: ['title', 'description'],
-		filterable: ['status', 'priority'],
+		Funnelable: ['status', 'priority'],
 		sortable: ['id', 'title', 'priority', 'dueDate', 'createdAt']
 	},
 	fields: {

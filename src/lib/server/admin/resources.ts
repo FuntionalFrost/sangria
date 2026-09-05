@@ -33,7 +33,7 @@ export const taskResource = defineResource(task, {
 	name: 'task',
 	label: 'Tasks',
 	singularLabel: 'Task',
-	icon: 'CheckSquare',
+	icon: 'SquareCheckBig',
 	group: 'Core',
 	list: {
 		columns: ['id', 'title', 'status', 'priority', 'dueDate', 'createdAt'],

@@ -36,7 +36,7 @@
 	<!-- Ambient Background Glow Gradients -->
 	<div class="pointer-events-none absolute inset-0 overflow-hidden">
 		<div
-			class="absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-linear-to-tr from-rose-500/20 via-amber-500/15 to-purple-600/20 blur-3xl opacity-70 dark:opacity-40"
+			class="absolute -top-40 left-1/2 h-125 w-200 -translate-x-1/2 rounded-full bg-linear-to-tr from-rose-500/20 via-amber-500/15 to-purple-600/20 opacity-70 blur-3xl dark:opacity-40"
 		></div>
 	</div>
 
@@ -47,16 +47,22 @@
 		<div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
 			<a href="/" class="flex items-center gap-3">
 				<SangriaLogo size={34} />
-				<span class="text-xl font-black tracking-tight text-zinc-900 dark:text-white"
-					>Sangria</span
-				>
+				<span class="text-xl font-black tracking-tight text-zinc-900 dark:text-white">Sangria</span>
 			</a>
 
 			<!-- svelte.dev style navigation items -->
-			<nav class="hidden items-center gap-6 text-sm font-semibold text-zinc-600 md:flex dark:text-zinc-400">
-				<a href="#batteries" class="transition-colors hover:text-rose-500 dark:hover:text-rose-400">Batteries</a>
-				<a href="#showcase" class="transition-colors hover:text-rose-500 dark:hover:text-rose-400">Showcase</a>
-				<a href="#quickstart" class="transition-colors hover:text-rose-500 dark:hover:text-rose-400">Quickstart</a>
+			<nav
+				class="hidden items-center gap-6 text-sm font-semibold text-zinc-600 md:flex dark:text-zinc-400"
+			>
+				<a href="#batteries" class="transition-colors hover:text-rose-500 dark:hover:text-rose-400"
+					>Batteries</a
+				>
+				<a href="#showcase" class="transition-colors hover:text-rose-500 dark:hover:text-rose-400"
+					>Showcase</a
+				>
+				<a href="#quickstart" class="transition-colors hover:text-rose-500 dark:hover:text-rose-400"
+					>Quickstart</a
+				>
 			</nav>
 
 			<div class="flex items-center gap-3">
@@ -97,7 +103,6 @@
 
 	<!-- Hero Section -->
 	<main class="relative mx-auto max-w-6xl space-y-12 px-6 pt-16 pb-24 text-center">
-
 		<!-- svelte.dev-style Definition Blurb -->
 		<div class="mx-auto max-w-xl text-left">
 			<div
@@ -114,16 +119,20 @@
 							>noun</span
 						>
 					</div>
-					<span class="font-sans text-xs font-bold uppercase tracking-wider text-zinc-400"
+					<span class="font-sans text-xs font-bold tracking-wider text-zinc-400 uppercase"
 						>Meta-Framework</span
 					>
 				</div>
-				<div class="mt-2.5 space-y-1 font-sans text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+				<div
+					class="mt-2.5 space-y-1 font-sans text-sm leading-relaxed text-zinc-700 dark:text-zinc-300"
+				>
 					<p>
-						<strong class="text-zinc-900 dark:text-white">1.</strong> A rich, refreshing blend of full-stack developer tools.
+						<strong class="text-zinc-900 dark:text-white">1.</strong> A rich, refreshing blend of full-stack
+						developer tools.
 					</p>
 					<p>
-						<strong class="text-zinc-900 dark:text-white">2.</strong> The batteries-included framework for solo SvelteKit developers who ship fast.
+						<strong class="text-zinc-900 dark:text-white">2.</strong> The batteries-included framework
+						for solo SvelteKit developers who ship fast.
 					</p>
 				</div>
 			</div>
@@ -133,8 +142,9 @@
 		<h1
 			class="mx-auto max-w-4xl text-4xl leading-[1.08] font-black tracking-tight text-zinc-900 sm:text-6xl md:text-7xl dark:text-white"
 		>
-			<span class="text-emerald-800 dark:text-emerald-500 font-black">Django's batteries.</span><br />
-			<span class="text-lime-500 dark:text-lime-400 font-black">Nuxt's modular DX.</span><br />
+			<span class="font-black text-emerald-800 dark:text-emerald-500">Django's batteries.</span><br
+			/>
+			<span class="font-black text-lime-500 dark:text-lime-400">Nuxt's modular DX.</span><br />
 			<span
 				class="bg-linear-to-r from-orange-500 via-rose-500 to-amber-500 bg-clip-text text-transparent"
 			>
@@ -146,9 +156,9 @@
 		<p
 			class="mx-auto max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg dark:text-zinc-400"
 		>
-			Stop rebuilding auth, admin UI, queues, email, and storage on every SvelteKit project.
-			Sangria gives you an auto-introspecting <code
-				class="rounded bg-rose-500/10 px-2 py-0.5 font-mono text-rose-500 font-semibold"
+			Stop rebuilding auth, admin UI, queues, email, and storage on every SvelteKit project. Sangria
+			gives you an auto-introspecting <code
+				class="rounded bg-rose-500/10 px-2 py-0.5 font-mono font-semibold text-rose-500"
 				>/admin</code
 			>, PostgreSQL 18, Drizzle ORM, Better-Auth, and Podman containers in one command.
 		</p>
@@ -181,7 +191,7 @@
 				class="group relative inline-flex cursor-pointer items-center gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-950 px-5 py-3 font-mono text-sm text-zinc-100 shadow-xl transition-all hover:border-rose-500/50"
 				title="Click to copy CLI command"
 			>
-				<span class="text-rose-400 font-bold">$</span>
+				<span class="font-bold text-rose-400">$</span>
 				<span>pnpm sangria createsuperuser</span>
 				<span
 					class="ml-2 flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-xs text-zinc-400 transition-colors group-hover:text-white"
@@ -255,38 +265,77 @@
 				</div>
 
 				<!-- Code Content Window -->
-				<div class="p-6 font-mono text-sm leading-relaxed text-zinc-300 overflow-x-auto">
+				<div class="overflow-x-auto p-6 font-mono text-sm leading-relaxed text-zinc-300">
 					{#if activeTab === 'resource'}
-						<pre class="text-zinc-300"><code><span class="text-rose-400">import</span> &#123; defineResource &#125; <span class="text-rose-400">from</span> <span class="text-amber-300">'$lib/sangria'</span>;
-<span class="text-rose-400">import</span> &#123; task &#125; <span class="text-rose-400">from</span> <span class="text-amber-300">'$lib/server/db/schema'</span>;
+						<pre class="text-zinc-300"><code
+								><span class="text-rose-400">import</span> &#123; defineResource &#125; <span
+									class="text-rose-400">from</span
+								> <span class="text-amber-300">'$lib/sangria'</span>;
+<span class="text-rose-400">import</span> &#123; task &#125; <span class="text-rose-400">from</span
+								> <span class="text-amber-300">'$lib/server/db/schema'</span>;
 
-<span class="text-purple-400">export const</span> taskResource = <span class="text-blue-400">defineResource</span>(task, &#123;
+<span class="text-purple-400">export const</span> taskResource = <span class="text-blue-400"
+									>defineResource</span
+								>(task, &#123;
   name: <span class="text-amber-300">'task'</span>,
   label: <span class="text-amber-300">'Tasks'</span>,
-  icon: <span class="text-amber-300">'CheckSquare'</span>,
+  icon: <span class="text-amber-300">'SquareCheckBig'</span>,
   list: &#123;
-    columns: [<span class="text-amber-300">'id'</span>, <span class="text-amber-300">'title'</span>, <span class="text-amber-300">'status'</span>, <span class="text-amber-300">'priority'</span>, <span class="text-amber-300">'createdAt'</span>],
-    searchable: [<span class="text-amber-300">'title'</span>, <span class="text-amber-300">'description'</span>],
-    filterable: [<span class="text-amber-300">'status'</span>, <span class="text-amber-300">'priority'</span>],
-    sortable: [<span class="text-amber-300">'id'</span>, <span class="text-amber-300">'title'</span>, <span class="text-amber-300">'createdAt'</span>]
+    columns: [<span class="text-amber-300">'id'</span>, <span class="text-amber-300">'title'</span
+								>, <span class="text-amber-300">'status'</span>, <span class="text-amber-300"
+									>'priority'</span
+								>, <span class="text-amber-300">'createdAt'</span>],
+    searchable: [<span class="text-amber-300">'title'</span>, <span class="text-amber-300"
+									>'description'</span
+								>],
+    Funnelable: [<span class="text-amber-300">'status'</span>, <span class="text-amber-300"
+									>'priority'</span
+								>],
+    sortable: [<span class="text-amber-300">'id'</span>, <span class="text-amber-300">'title'</span
+								>, <span class="text-amber-300">'createdAt'</span>]
   &#125;,
   permissions: &#123;
-    create: (user) =&gt; user?.role === <span class="text-amber-300">'admin'</span> || user?.role === <span class="text-amber-300">'superadmin'</span>
+    create: (user) =&gt; user?.role === <span class="text-amber-300">'admin'</span
+								> || user?.role === <span class="text-amber-300">'superadmin'</span>
   &#125;
-&#125;);</code></pre>
+&#125;);</code
+							></pre>
 					{:else if activeTab === 'schema'}
-						<pre class="text-zinc-300"><code><span class="text-rose-400">import</span> &#123; pgTable, serial, text, integer, timestamp &#125; <span class="text-rose-400">from</span> <span class="text-amber-300">'drizzle-orm/pg-core'</span>;
+						<pre class="text-zinc-300"><code
+								><span class="text-rose-400">import</span
+								> &#123; pgTable, serial, text, integer, timestamp &#125; <span
+									class="text-rose-400">from</span
+								> <span class="text-amber-300">'drizzle-orm/pg-core'</span>;
 
-<span class="text-purple-400">export const</span> task = <span class="text-blue-400">pgTable</span>(<span class="text-amber-300">'task'</span>, &#123;
-  id: <span class="text-blue-400">serial</span>(<span class="text-amber-300">'id'</span>).<span class="text-blue-400">primaryKey</span>(),
-  title: <span class="text-blue-400">text</span>(<span class="text-amber-300">'title'</span>).<span class="text-blue-400">notNull</span>(),
-  description: <span class="text-blue-400">text</span>(<span class="text-amber-300">'description'</span>),
-  status: <span class="text-blue-400">text</span>(<span class="text-amber-300">'status'</span>).<span class="text-blue-400">default</span>(<span class="text-amber-300">'todo'</span>).<span class="text-blue-400">notNull</span>(),
-  priority: <span class="text-blue-400">integer</span>(<span class="text-amber-300">'priority'</span>).<span class="text-blue-400">default</span>(1).<span class="text-blue-400">notNull</span>(),
-  createdAt: <span class="text-blue-400">timestamp</span>(<span class="text-amber-300">'created_at'</span>).<span class="text-blue-400">defaultNow</span>().<span class="text-blue-400">notNull</span>()
-&#125;);</code></pre>
+<span class="text-purple-400">export const</span> task = <span class="text-blue-400">pgTable</span
+								>(<span class="text-amber-300">'task'</span>, &#123;
+  id: <span class="text-blue-400">serial</span>(<span class="text-amber-300">'id'</span>).<span
+									class="text-blue-400">primaryKey</span
+								>(),
+  title: <span class="text-blue-400">text</span>(<span class="text-amber-300">'title'</span>).<span
+									class="text-blue-400">notNull</span
+								>(),
+  description: <span class="text-blue-400">text</span>(<span class="text-amber-300"
+									>'description'</span
+								>),
+  status: <span class="text-blue-400">text</span>(<span class="text-amber-300">'status'</span
+								>).<span class="text-blue-400">default</span>(<span class="text-amber-300"
+									>'todo'</span
+								>).<span class="text-blue-400">notNull</span>(),
+  priority: <span class="text-blue-400">integer</span>(<span class="text-amber-300">'priority'</span
+								>).<span class="text-blue-400">default</span>(1).<span class="text-blue-400"
+									>notNull</span
+								>(),
+  createdAt: <span class="text-blue-400">timestamp</span>(<span class="text-amber-300"
+									>'created_at'</span
+								>).<span class="text-blue-400">defaultNow</span>().<span class="text-blue-400"
+									>notNull</span
+								>()
+&#125;);</code
+							></pre>
 					{:else if activeTab === 'cli'}
-						<pre class="text-zinc-300"><code><span class="text-zinc-500"># 1. Start Infrastructure Stack</span>
+						<pre class="text-zinc-300"><code
+								><span class="text-zinc-500"># 1. Start Infrastructure Stack</span>
 <span class="text-rose-400">$</span> podman compose up -d
 
 <span class="text-zinc-500"># 2. Push Database Migrations</span>
@@ -297,18 +346,25 @@
 <span class="text-emerald-400">✔ Enter admin name:</span> Administrator
 <span class="text-emerald-400">✔ Enter admin email:</span> admin@sangria.local
 <span class="text-emerald-400">✔ Enter admin password:</span> ••••••••••••
-<span class="text-amber-300">★ Superuser created successfully! Log in at /admin</span></code></pre>
+<span class="text-amber-300">★ Superuser created successfully! Log in at /admin</span></code
+							></pre>
 					{:else if activeTab === 'queue'}
-						<pre class="text-zinc-300"><code><span class="text-rose-400">import</span> &#123; JobQueue &#125; <span class="text-rose-400">from</span> <span class="text-amber-300">'$lib/sangria'</span>;
+						<pre class="text-zinc-300"><code
+								><span class="text-rose-400">import</span> &#123; JobQueue &#125; <span
+									class="text-rose-400">from</span
+								> <span class="text-amber-300">'$lib/sangria'</span>;
 
 <span class="text-zinc-500">// Enqueue background job in SvelteKit server action</span>
-<span class="text-rose-400">await</span> JobQueue.<span class="text-blue-400">dispatch</span>(<span class="text-amber-300">'send-welcome-email'</span>, &#123;
+<span class="text-rose-400">await</span> JobQueue.<span class="text-blue-400">dispatch</span>(<span
+									class="text-amber-300">'send-welcome-email'</span
+								>, &#123;
   to: <span class="text-amber-300">'user@sangria.local'</span>,
   template: <span class="text-amber-300">'welcome'</span>
 &#125;);
 
 <span class="text-zinc-500">// Start CLI worker process to handle jobs in background</span>
-<span class="text-rose-400">$</span> pnpm sangria queue:work</code></pre>
+<span class="text-rose-400">$</span> pnpm sangria queue:work</code
+							></pre>
 					{/if}
 				</div>
 			</div>
@@ -322,11 +378,14 @@
 				>
 					<span>⚡ FULL-STACK OUT OF THE BOX</span>
 				</div>
-				<h2 class="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+				<h2
+					class="mt-3 text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+				>
 					The 6 Batteries Included
 				</h2>
 				<p class="mx-auto mt-2 max-w-xl text-sm font-medium text-zinc-500 dark:text-zinc-400">
-					Built on the modern web stack. Everything you need to ship full-stack web apps without assembling 20 npm packages.
+					Built on the modern web stack. Everything you need to ship full-stack web apps without
+					assembling 20 npm packages.
 				</p>
 			</div>
 
@@ -354,8 +413,8 @@
 							Auto-Introspecting /admin
 						</h3>
 						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-							Generates data tables, search, multi-column sorting, bulk row actions, CSV exports, and
-							edit modals directly from Drizzle schemas.
+							Generates data tables, search, multi-column sorting, bulk row actions, CSV exports,
+							and edit modals directly from Drizzle schemas.
 						</p>
 					</div>
 					<div
@@ -387,8 +446,8 @@
 						</div>
 						<h3 class="text-base font-bold text-zinc-900 dark:text-white">Better-Auth & RBAC</h3>
 						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-							Session cookies, social OAuth providers, role guards in SvelteKit hooks, and interactive
-							CLI superuser provisioning.
+							Session cookies, social OAuth providers, role guards in SvelteKit hooks, and
+							interactive CLI superuser provisioning.
 						</p>
 					</div>
 					<div
@@ -418,10 +477,12 @@
 								class="h-4 w-4 text-zinc-400 transition-colors group-hover:text-blue-500"
 							/>
 						</div>
-						<h3 class="text-base font-bold text-zinc-900 dark:text-white">PostgreSQL 18 & Drizzle</h3>
+						<h3 class="text-base font-bold text-zinc-900 dark:text-white">
+							PostgreSQL 18 & Drizzle
+						</h3>
 						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-							End-to-end TypeScript safety with Drizzle ORM, Drizzle Kit migrations, Zod validation, and
-							relational foreign key dropdowns.
+							End-to-end TypeScript safety with Drizzle ORM, Drizzle Kit migrations, Zod validation,
+							and relational foreign key dropdowns.
 						</p>
 					</div>
 					<div
@@ -488,8 +549,8 @@
 							Transactional Email & Mailpit
 						</h3>
 						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-							Svelte email templates with Nodemailer transport and zero-config local email inspection
-							at port 8025 via Mailpit.
+							Svelte email templates with Nodemailer transport and zero-config local email
+							inspection at port 8025 via Mailpit.
 						</p>
 					</div>
 					<div
@@ -519,7 +580,9 @@
 								class="h-4 w-4 text-zinc-400 transition-colors group-hover:text-cyan-500"
 							/>
 						</div>
-						<h3 class="text-base font-bold text-zinc-900 dark:text-white">S3 & MinIO Object Storage</h3>
+						<h3 class="text-base font-bold text-zinc-900 dark:text-white">
+							S3 & MinIO Object Storage
+						</h3>
 						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
 							Direct pre-signed browser uploads, S3 bucket explorer, and seamless switching between
 							local MinIO and Cloudflare R2 / AWS S3.
@@ -598,9 +661,7 @@
 		>
 			<div class="flex items-center gap-3">
 				<SangriaLogo size={28} />
-				<span class="font-bold text-zinc-900 dark:text-white"
-					>Sangria Framework © 2026</span
-				>
+				<span class="font-bold text-zinc-900 dark:text-white">Sangria Framework © 2026</span>
 				<span>— Released under MIT License</span>
 			</div>
 

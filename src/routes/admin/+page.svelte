@@ -11,7 +11,7 @@
 <div class="space-y-8">
 	<!-- Top Welcome & Status Banner -->
 	<div
-		class="flex flex-col gap-4 rounded-2xl border border-rose-500/20 bg-gradient-to-r from-rose-500/10 via-amber-500/5 to-transparent p-6 md:flex-row md:items-center md:justify-between"
+		class="flex flex-col gap-4 rounded-2xl border border-rose-500/20 bg-linear-to-r from-rose-500/10 via-amber-500/5 to-transparent p-6 md:flex-row md:items-center md:justify-between"
 	>
 		<div>
 			<h1
@@ -147,7 +147,7 @@
 				<div
 					class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 transition-colors group-hover:bg-rose-500 group-hover:text-white dark:bg-zinc-800 dark:text-zinc-400"
 				>
-					<AdminIcon name="CheckSquare" class="h-4 w-4" />
+					<AdminIcon name="SquareCheckBig" class="h-4 w-4" />
 				</div>
 			</div>
 			<div class="mt-4 text-3xl font-extrabold text-zinc-900 dark:text-white">
@@ -210,7 +210,7 @@
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="flex items-center gap-2 text-sm font-bold text-zinc-900 dark:text-white">
-					<AdminIcon name="CheckSquare" class="h-4 w-4 text-rose-500" />
+					<AdminIcon name="SquareCheckBig" class="h-4 w-4 text-rose-500" />
 					<span>Recent Tasks</span>
 				</h2>
 				<a href="/admin/task" class="text-xs font-medium text-rose-500 hover:text-rose-600"

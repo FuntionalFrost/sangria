@@ -132,7 +132,7 @@
 		class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
 	>
 		<h2 class="flex items-center gap-2 text-sm font-bold text-zinc-900 dark:text-white">
-			<AdminIcon name="UploadCloud" class="h-4 w-4 text-rose-500" />
+			<AdminIcon name="CloudUpload" class="h-4 w-4 text-rose-500" />
 			<span>Upload Object</span>
 		</h2>
 
@@ -154,7 +154,7 @@
 					<AdminIcon name="RefreshCw" class="h-3.5 w-3.5 animate-spin" />
 					<span>Uploading...</span>
 				{:else}
-					<AdminIcon name="UploadCloud" class="h-3.5 w-3.5" />
+					<AdminIcon name="CloudUpload" class="h-3.5 w-3.5" />
 					<span>Upload File</span>
 				{/if}
 			</button>
