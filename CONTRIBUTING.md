@@ -7,7 +7,8 @@ Thank you for considering contributing to **Sangria**! We welcome contributions 
 ## 🛠️ Local Development Setup
 
 ### 1. Prerequisites
-- **Node.js**: v20 or higher
+
+- **Node.js**: v24 or higher
 - **pnpm**: v9 or higher
 - **Podman** or **Docker**: for running PostgreSQL 18, Mailpit, and MinIO S3 containers
 
@@ -51,4 +52,5 @@ pnpm build
 ---
 
 ## 📄 License
+
 By contributing to Sangria, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
