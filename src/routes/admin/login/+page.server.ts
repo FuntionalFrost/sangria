@@ -24,14 +24,15 @@ export const actions: Actions = {
 		try {
 			const res = await auth.api.signInEmail({
 				body: { email, password },
-				asResponse: true
+				headers: request.headers
 			});
 
-			if (!res.ok) {
-				return fail(400, { error: 'Invalid email or password', email });
+			if (res?.user?.role !== 'admin' && res?.user?.role !== 'superadmin') {
+				await auth.api.signOut({ headers: request.headers }).catch(() => {});
+				return fail(403, { error: 'Forbidden: Administrator privileges required', email });
 			}
 		} catch (err: any) {
-			return fail(400, { error: err?.message || 'Authentication failed', email });
+			return fail(400, { error: err?.message || 'Invalid email or password', email });
 		}
 
 		throw redirect(302, redirectTo);

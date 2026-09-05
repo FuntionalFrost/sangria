@@ -7,8 +7,8 @@ import { getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
 
 export const auth = betterAuth({
-	baseURL: env.ORIGIN || 'http://localhost:5173',
-	secret: env.BETTER_AUTH_SECRET,
+	baseURL: env.ORIGIN || env.BETTER_AUTH_URL || 'http://localhost:5173',
+	secret: env.BETTER_AUTH_SECRET || 'sangria-super-secret-development-key-1234567890',
 	database: drizzleAdapter(db, { provider: 'pg' }),
 	emailAndPassword: { enabled: true },
 	socialProviders: {

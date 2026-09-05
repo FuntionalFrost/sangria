@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import AdminIcon from '$lib/components/admin/AdminIcon.svelte';
+	import SangriaLogo from '$lib/components/SangriaLogo.svelte';
 
 	let { form } = $props();
 	let loading = $state(false);
@@ -17,11 +18,7 @@
 	class="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
 >
 	<div class="mb-8 flex flex-col items-center text-center">
-		<div
-			class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-amber-500 text-white shadow-lg shadow-rose-500/30"
-		>
-			<span class="text-xl font-black">S</span>
-		</div>
+		<SangriaLogo size={48} class="mb-4" />
 		<h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Sangria Admin</h1>
 		<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
 			Sign in with your administrator credentials
@@ -83,7 +80,7 @@
 				name="password"
 				required
 				autocomplete="current-password"
-				placeholder="��������"
+				placeholder="••••••••"
 				class="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
 			/>
 		</div>
@@ -91,7 +88,7 @@
 		<button
 			type="submit"
 			disabled={loading}
-			class="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-rose-500 to-rose-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-rose-500/20 transition-all hover:from-rose-600 hover:to-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+			class="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-rose-500 to-rose-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-rose-500/20 transition-all hover:from-rose-600 hover:to-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			{#if loading}
 				<AdminIcon name="RefreshCw" class="h-4 w-4 animate-spin" />

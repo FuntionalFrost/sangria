@@ -32,6 +32,8 @@ export interface FieldConfig {
 	helpText?: string;
 	readonly?: boolean;
 	hidden?: boolean;
+	referencesResource?: string;
+	referenceLabelField?: string;
 }
 
 export interface ResourceListConfig {

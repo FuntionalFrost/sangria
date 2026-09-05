@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { toggleMode } from 'mode-watcher';
+	import { toggleMode, mode } from 'mode-watcher';
 	import AdminIcon from '$lib/components/admin/AdminIcon.svelte';
+	import SangriaLogo from '$lib/components/SangriaLogo.svelte';
 
 	let { data, children } = $props();
 
@@ -44,11 +45,7 @@
 					href="/admin"
 					class="group flex items-center gap-2.5 text-lg font-bold text-zinc-900 dark:text-white"
 				>
-					<div
-						class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/30"
-					>
-						<span class="text-sm font-black tracking-tight">S</span>
-					</div>
+					<SangriaLogo size={32} />
 					<div class="flex flex-col">
 						<span class="text-base leading-none font-extrabold tracking-tight">Sangria</span>
 						<span class="mt-0.5 text-[10px] font-medium tracking-wider text-zinc-400 uppercase"
@@ -165,11 +162,15 @@
 					<button
 						type="button"
 						onclick={() => toggleMode()}
-						class="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						title="Toggle Theme"
+						class="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+						title="Toggle Theme ({mode.current || 'system'})"
 						aria-label="Toggle theme"
 					>
-						<AdminIcon name="Sun" class="h-4 w-4" />
+						{#if mode.current === 'dark'}
+							<AdminIcon name="Sun" class="h-4 w-4 text-amber-400" />
+						{:else}
+							<AdminIcon name="Moon" class="h-4 w-4 text-zinc-600 dark:text-zinc-300" />
+						{/if}
 					</button>
 					<form action="/admin/login?/logout" method="POST">
 						<button

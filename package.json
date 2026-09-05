@@ -1,7 +1,21 @@
 {
 	"name": "sangria",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.1.0",
+	"description": "The Batteries-Included SvelteKit Framework for Solo Web Developers",
+	"license": "MIT",
+	"homepage": "https://github.com/FuntionalFrost/sangria",
+	"keywords": [
+		"svelte",
+		"svelte5",
+		"sveltekit",
+		"django",
+		"admin",
+		"drizzle-orm",
+		"better-auth",
+		"postgres",
+		"pg-boss"
+	],
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

@@ -1,9 +1,10 @@
+import { getTableColumns } from 'drizzle-orm';
 import { getTableConfig, type PgTable, type PgColumn } from 'drizzle-orm/pg-core';
 import type { FieldConfig, WidgetType } from './types';
 
 function toTitleCase(str: string): string {
 	return str
-		.replace(/([A-Z])/g, ' ')
+		.replace(/([A-Z])/g, ' $1')
 		.replace(/[_-]/g, ' ')
 		.replace(/^\w/, (c) => c.toUpperCase())
 		.trim();
@@ -29,8 +30,19 @@ function inferWidget(dataType: string, columnName: string): WidgetType {
 	return 'text';
 }
 
-function mapDataType(columnType: string): FieldConfig['dataType'] {
-	const t = columnType.toLowerCase();
+function mapDataType(
+	dataType: string | undefined,
+	columnType: string | undefined
+): FieldConfig['dataType'] {
+	if (
+		dataType === 'number' ||
+		dataType === 'boolean' ||
+		dataType === 'date' ||
+		dataType === 'json'
+	) {
+		return dataType;
+	}
+	const t = (columnType || '').toLowerCase();
 	if (
 		t.includes('int') ||
 		t.includes('serial') ||
@@ -52,6 +64,26 @@ function mapDataType(columnType: string): FieldConfig['dataType'] {
 	return 'string';
 }
 
+function sanitizeDefaultValue(val: unknown): unknown {
+	if (val === null || val === undefined) return undefined;
+	if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+		return val;
+	}
+	if (val instanceof Date) {
+		return val.toISOString();
+	}
+	if (typeof val === 'object') {
+		try {
+			if (Object.getPrototypeOf(val) === Object.prototype || Array.isArray(val)) {
+				return JSON.parse(JSON.stringify(val));
+			}
+		} catch {
+			return undefined;
+		}
+	}
+	return undefined;
+}
+
 export function introspectTable(table: PgTable): {
 	tableName: string;
 	primaryKey: string;
@@ -59,29 +91,28 @@ export function introspectTable(table: PgTable): {
 } {
 	const config = getTableConfig(table);
 	const tableName = config.name;
+	const columns = getTableColumns(table);
 	const fields: Record<string, FieldConfig> = {};
 	let primaryKey = 'id';
 
-	for (const column of config.columns as PgColumn[]) {
-		const colName = column.name;
-		const colType = column.columnType;
-		const dataType = mapDataType(colType);
+	for (const [propName, column] of Object.entries(columns) as [string, PgColumn][]) {
+		const dataType = mapDataType((column as any).dataType, column.columnType);
 		const isPrimary = column.primary;
 		if (isPrimary) {
-			primaryKey = colName;
+			primaryKey = propName;
 		}
 
-		fields[colName] = {
-			name: colName,
-			label: toTitleCase(colName),
+		fields[propName] = {
+			name: propName,
+			label: toTitleCase(propName),
 			dataType,
-			widget: inferWidget(dataType, colName),
+			widget: inferWidget(dataType, propName),
 			required: column.notNull && !column.hasDefault && !isPrimary,
 			nullable: !column.notNull,
 			primaryKey: isPrimary,
-			defaultValue: column.default,
+			defaultValue: sanitizeDefaultValue(column.default),
 			readonly: isPrimary,
-			hidden: colName === 'password'
+			hidden: propName === 'password'
 		};
 	}
 

@@ -1,7 +1,9 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import crypto from 'node:crypto';
 import {
 	registry,
+	fetchResourceList,
 	fetchResourceItem,
 	createResourceItem,
 	updateResourceItem,
@@ -19,38 +21,47 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		if (resource.permissions.create && !resource.permissions.create(locals.user)) {
 			throw error(403, 'You do not have permission to create this resource.');
 		}
-		return {
-			isNew: true,
-			resource: {
-				name: resource.name,
-				label: resource.label,
-				singularLabel: resource.singularLabel,
-				icon: resource.icon,
-				primaryKey: resource.primaryKey,
-				fields: resource.fields
-			},
-			item: {} as Record<string, unknown>
-		};
+	} else {
+		if (resource.permissions.edit && !resource.permissions.edit(locals.user)) {
+			throw error(403, 'You do not have permission to edit this resource.');
+		}
 	}
 
-	if (resource.permissions.edit && !resource.permissions.edit(locals.user)) {
-		throw error(403, 'You do not have permission to edit this resource.');
-	}
+	const item = isNew ? {} : await fetchResourceItem(resource, params.id);
+	if (!isNew && !item) throw error(404, 'Record not found');
 
-	const item = await fetchResourceItem(resource, params.id);
-	if (!item) throw error(404, 'Record not found');
+	// Populate relational options for fields referencing another resource
+	const resolvedFields = JSON.parse(JSON.stringify(resource.fields));
+	for (const [fieldName, fieldConfig] of Object.entries(resource.fields)) {
+		if (fieldConfig.referencesResource) {
+			const targetResource = registry.getResource(fieldConfig.referencesResource);
+			if (targetResource) {
+				const targetData = await fetchResourceList(targetResource, { perPage: 100 });
+				const labelKey = fieldConfig.referenceLabelField || 'name';
+				const options = targetData.items.map((it: any) => ({
+					label: String(it[labelKey] || it.title || it.name || it[targetResource.primaryKey]),
+					value: it[targetResource.primaryKey]
+				}));
+				resolvedFields[fieldName] = {
+					...fieldConfig,
+					widget: 'select',
+					options
+				};
+			}
+		}
+	}
 
 	return {
-		isNew: false,
+		isNew,
 		resource: {
 			name: resource.name,
 			label: resource.label,
 			singularLabel: resource.singularLabel,
 			icon: resource.icon,
 			primaryKey: resource.primaryKey,
-			fields: resource.fields
+			fields: resolvedFields
 		},
-		item
+		item: item || {}
 	};
 };
 
@@ -87,9 +98,18 @@ export const actions: Actions = {
 				if (rawValue) {
 					dataToSave[fieldName] = new Date(String(rawValue));
 				}
-			} else if (rawValue !== null) {
+			} else if (rawValue !== null && rawValue !== '') {
 				dataToSave[fieldName] = rawValue;
 			}
+		}
+
+		// If resource has a string primary key (e.g. user) and isNew, generate UUID
+		if (
+			isNew &&
+			!dataToSave[resource.primaryKey] &&
+			resource.fields[resource.primaryKey]?.dataType === 'string'
+		) {
+			dataToSave[resource.primaryKey] = crypto.randomUUID();
 		}
 
 		try {

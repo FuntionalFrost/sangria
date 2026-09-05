@@ -81,6 +81,11 @@ export const postResource = defineResource(post, {
 	},
 	fields: {
 		id: { readonly: true },
+		authorId: {
+			label: 'Author',
+			referencesResource: 'user',
+			referenceLabelField: 'name'
+		},
 		content: { widget: 'textarea' },
 		published: { widget: 'switch' }
 	}

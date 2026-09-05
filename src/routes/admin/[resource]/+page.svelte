@@ -7,7 +7,69 @@
 
 	let { data } = $props();
 
-	let searchQuery = $state(data.query.search || '');
+	let searchQuery = $state('');
+	let selectedIds = $state(new Set<string>());
+
+	$effect.pre(() => {
+		searchQuery = data.query.search || '';
+	});
+
+	function toggleSelectAll() {
+		if (selectedIds.size === data.data.items.length) {
+			selectedIds.clear();
+		} else {
+			for (const item of data.data.items) {
+				selectedIds.add(String(item[data.resource.primaryKey]));
+			}
+		}
+	}
+
+	function toggleSelectRow(id: string) {
+		if (selectedIds.has(id)) {
+			selectedIds.delete(id);
+		} else {
+			selectedIds.add(id);
+		}
+	}
+
+	function exportToCSV() {
+		const itemsToExport =
+			selectedIds.size > 0
+				? data.data.items.filter((item) =>
+						selectedIds.has(String(item[data.resource.primaryKey]))
+					)
+				: data.data.items;
+
+		if (itemsToExport.length === 0) {
+			toast.error('No items to export');
+			return;
+		}
+
+		const cols = data.resource.list.columns || Object.keys(data.resource.fields);
+		const headers = cols.map((c) => data.resource.fields[c]?.label || c);
+		const rows = [headers.join(',')];
+
+		for (const item of itemsToExport) {
+			const row = cols.map((c) => {
+				const val = item[c];
+				const str = val === null || val === undefined ? '' : String(val).replace(/"/g, '""');
+				return `"${str}"`;
+			});
+			rows.push(row.join(','));
+		}
+
+		const csvData = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rows.join('\n'));
+		const link = document.createElement('a');
+		link.setAttribute('href', csvData);
+		link.setAttribute(
+			'download',
+			`${data.resource.name}_export_${new Date().toISOString().slice(0, 10)}.csv`
+		);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		toast.success(`Exported ${itemsToExport.length} records to CSV`);
+	}
 
 	function handleSearch(e: SubmitEvent) {
 		e.preventDefault();
@@ -66,7 +128,20 @@
 	<title>{data.resource.label} - Sangria Admin</title>
 </svelte:head>
 
+{#key data.resource.name}
 <div class="space-y-6">
+	{#if data.dbError}
+		<div
+			class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300"
+		>
+			<AdminIcon name="AlertTriangle" class="h-5 w-5 shrink-0 text-amber-500" />
+			<div>
+				<div class="font-bold">Database Notice</div>
+				<div class="mt-0.5">{data.dbError}</div>
+			</div>
+		</div>
+	{/if}
+
 	<!-- Page Header -->
 	<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 		<div>
@@ -109,21 +184,63 @@
 			/>
 		</form>
 
-		{#if data.query.search}
+		<div class="flex items-center gap-2">
+			{#if data.query.search}
+				<button
+					type="button"
+					onclick={() => {
+						searchQuery = '';
+						const url = new URL(page.url);
+						url.searchParams.delete('search');
+						goto(url.toString());
+					}}
+					class="flex cursor-pointer items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 mr-2"
+				>
+					<AdminIcon name="X" class="h-3.5 w-3.5" />
+					<span>Clear search</span>
+				</button>
+			{/if}
+
 			<button
 				type="button"
-				onclick={() => {
-					searchQuery = '';
-					const url = new URL(page.url);
-					url.searchParams.delete('search');
-					goto(url.toString());
-				}}
-				class="flex cursor-pointer items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+				onclick={exportToCSV}
+				class="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 shadow-xs transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+				title="Export to CSV"
 			>
-				<AdminIcon name="X" class="h-3.5 w-3.5" />
-				<span>Clear search</span>
+				<AdminIcon name="Download" class="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+				<span>Export CSV {selectedIds.size > 0 ? `(${selectedIds.size})` : ''}</span>
 			</button>
-		{/if}
+
+			{#if selectedIds.size > 0}
+				<form
+					method="POST"
+					action="?/bulkDelete"
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							if (result.type === 'success') {
+								toast.success(`Deleted ${selectedIds.size} records`);
+								selectedIds.clear();
+							}
+							await update();
+						};
+					}}
+				>
+					<input type="hidden" name="ids" value={JSON.stringify(Array.from(selectedIds))} />
+					<button
+						type="submit"
+						onclick={(e) => {
+							if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected record(s)?`)) {
+								e.preventDefault();
+							}
+						}}
+						class="flex cursor-pointer items-center gap-1.5 rounded-lg bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-600 border border-rose-200 transition-colors hover:bg-rose-500 hover:text-white dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-400"
+					>
+						<AdminIcon name="Trash2" class="h-3.5 w-3.5" />
+						<span>Delete Selected ({selectedIds.size})</span>
+					</button>
+				</form>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Data Table -->
@@ -136,6 +253,14 @@
 					<tr
 						class="border-b border-zinc-200 bg-zinc-50/70 dark:border-zinc-800 dark:bg-zinc-800/40"
 					>
+						<th class="w-10 px-4 py-3">
+							<input
+								type="checkbox"
+								checked={data.data.items.length > 0 && selectedIds.size === data.data.items.length}
+								onchange={toggleSelectAll}
+								class="h-4 w-4 rounded border-zinc-300 text-rose-500 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-zinc-800 cursor-pointer"
+							/>
+						</th>
 						{#each data.resource.list.columns || [] as colName (colName)}
 							{@const field = data.resource.fields[colName]}
 							{@const isSorted = data.query.sort === colName}
@@ -162,7 +287,7 @@
 					{#if data.data.items.length === 0}
 						<tr>
 							<td
-								colspan={(data.resource.list.columns?.length || 0) + 1}
+								colspan={(data.resource.list.columns?.length || 0) + 2}
 								class="py-12 text-center text-zinc-400"
 							>
 								No records found.
@@ -170,8 +295,16 @@
 						</tr>
 					{:else}
 						{#each data.data.items as item (item[data.resource.primaryKey])}
-							{@const id = item[data.resource.primaryKey]}
-							<tr class="transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
+							{@const id = String(item[data.resource.primaryKey])}
+							<tr class="transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 {selectedIds.has(id) ? 'bg-rose-50/40 dark:bg-rose-950/20' : ''}">
+								<td class="w-10 px-4 py-3">
+									<input
+										type="checkbox"
+										checked={selectedIds.has(id)}
+										onchange={() => toggleSelectRow(id)}
+										class="h-4 w-4 rounded border-zinc-300 text-rose-500 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-zinc-800 cursor-pointer"
+									/>
+								</td>
 								{#each data.resource.list.columns || [] as colName (colName)}
 									{@const val = item[colName]}
 									{@const field = data.resource.fields[colName]}
@@ -292,3 +425,4 @@
 		{/if}
 	</div>
 </div>
+{/key}

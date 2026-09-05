@@ -1,20 +1,26 @@
-import { sql, and, or, ilike, eq, asc, desc, count } from 'drizzle-orm';
+import { sql, and, or, ilike, eq, asc, desc, count, getTableColumns, inArray } from 'drizzle-orm';
 import type { PgTable, PgColumn } from 'drizzle-orm/pg-core';
-import { getTableConfig } from 'drizzle-orm/pg-core';
 import type { ResourceDefinition, QueryParams, PaginatedResult } from '../core/types';
 import { db } from '$lib/server/db';
+
+function buildColumnsMap(table: PgTable): Map<string, PgColumn> {
+	const columnsMap = new Map<string, PgColumn>();
+	const cols = getTableColumns(table);
+	for (const [propName, col] of Object.entries(cols) as [string, PgColumn][]) {
+		columnsMap.set(propName, col);
+		if (col.name) {
+			columnsMap.set(col.name, col);
+		}
+	}
+	return columnsMap;
+}
 
 export async function fetchResourceList(
 	resource: ResourceDefinition,
 	params: QueryParams = {}
 ): Promise<PaginatedResult> {
 	const table = resource.table as PgTable;
-	const config = getTableConfig(table);
-	const columnsMap = new Map<string, PgColumn>();
-
-	for (const col of config.columns as PgColumn[]) {
-		columnsMap.set(col.name, col);
-	}
+	const columnsMap = buildColumnsMap(table);
 
 	const page = Math.max(1, Number(params.page) || 1);
 	const perPage = Math.min(100, Math.max(1, Number(params.perPage) || resource.list.perPage || 20));
@@ -69,13 +75,19 @@ export async function fetchResourceList(
 	// Query data and total count concurrently
 	const dbClient = db as any;
 
-	const countQuery = dbClient.select({ value: count() }).from(table);
-	if (whereClause) countQuery.where(whereClause);
+	let countQuery = dbClient.select({ value: count() }).from(table);
+	if (whereClause) {
+		countQuery = countQuery.where(whereClause);
+	}
 
-	const dataQuery = dbClient.select().from(table);
-	if (whereClause) dataQuery.where(whereClause);
-	if (orderByClause) dataQuery.orderBy(orderByClause);
-	dataQuery.limit(perPage).offset(offset);
+	let dataQuery = dbClient.select().from(table);
+	if (whereClause) {
+		dataQuery = dataQuery.where(whereClause);
+	}
+	if (orderByClause) {
+		dataQuery = dataQuery.orderBy(orderByClause);
+	}
+	dataQuery = dataQuery.limit(perPage).offset(offset);
 
 	const [totalResult, items] = await Promise.all([countQuery, dataQuery]);
 	const total = Number(totalResult[0]?.value || 0);
@@ -94,13 +106,19 @@ export async function fetchResourceItem(
 	id: string | number
 ): Promise<Record<string, unknown> | null> {
 	const table = resource.table as PgTable;
-	const config = getTableConfig(table);
-	const pkCol = (config.columns as PgColumn[]).find((c) => c.name === resource.primaryKey);
+	const columnsMap = buildColumnsMap(table);
+	const pkCol = columnsMap.get(resource.primaryKey);
 
 	if (!pkCol) throw new Error(`Primary key not found for resource ${resource.name}`);
 
+	const isNum =
+		(pkCol as any).dataType === 'number' ||
+		(pkCol as any).columnType?.includes('Int') ||
+		(pkCol as any).columnType?.includes('Serial');
+	const parsedId = isNum && !isNaN(Number(id)) ? Number(id) : id;
+
 	const dbClient = db as any;
-	const items = await dbClient.select().from(table).where(eq(pkCol, id)).limit(1);
+	const items = await dbClient.select().from(table).where(eq(pkCol, parsedId)).limit(1);
 
 	return items[0] || null;
 }
@@ -121,13 +139,19 @@ export async function updateResourceItem(
 	data: Record<string, unknown>
 ): Promise<Record<string, unknown>> {
 	const table = resource.table as PgTable;
-	const config = getTableConfig(table);
-	const pkCol = (config.columns as PgColumn[]).find((c) => c.name === resource.primaryKey);
+	const columnsMap = buildColumnsMap(table);
+	const pkCol = columnsMap.get(resource.primaryKey);
 
 	if (!pkCol) throw new Error(`Primary key not found for resource ${resource.name}`);
 
+	const isNum =
+		(pkCol as any).dataType === 'number' ||
+		(pkCol as any).columnType?.includes('Int') ||
+		(pkCol as any).columnType?.includes('Serial');
+	const parsedId = isNum && !isNaN(Number(id)) ? Number(id) : id;
+
 	const dbClient = db as any;
-	const result = await dbClient.update(table).set(data).where(eq(pkCol, id)).returning();
+	const result = await dbClient.update(table).set(data).where(eq(pkCol, parsedId)).returning();
 	return result[0];
 }
 
@@ -136,12 +160,42 @@ export async function deleteResourceItem(
 	id: string | number
 ): Promise<boolean> {
 	const table = resource.table as PgTable;
-	const config = getTableConfig(table);
-	const pkCol = (config.columns as PgColumn[]).find((c) => c.name === resource.primaryKey);
+	const columnsMap = buildColumnsMap(table);
+	const pkCol = columnsMap.get(resource.primaryKey);
 
 	if (!pkCol) throw new Error(`Primary key not found for resource ${resource.name}`);
 
+	const isNum =
+		(pkCol as any).dataType === 'number' ||
+		(pkCol as any).columnType?.includes('Int') ||
+		(pkCol as any).columnType?.includes('Serial');
+	const parsedId = isNum && !isNaN(Number(id)) ? Number(id) : id;
+
 	const dbClient = db as any;
-	await dbClient.delete(table).where(eq(pkCol, id));
+	await dbClient.delete(table).where(eq(pkCol, parsedId));
 	return true;
+}
+
+export async function bulkDeleteResourceItems(
+	resource: ResourceDefinition,
+	ids: Array<string | number>
+): Promise<number> {
+	if (!ids || ids.length === 0) return 0;
+
+	const table = resource.table as PgTable;
+	const columnsMap = buildColumnsMap(table);
+	const pkCol = columnsMap.get(resource.primaryKey);
+
+	if (!pkCol) throw new Error(`Primary key not found for resource ${resource.name}`);
+
+	const isNum =
+		(pkCol as any).dataType === 'number' ||
+		(pkCol as any).columnType?.includes('Int') ||
+		(pkCol as any).columnType?.includes('Serial');
+
+	const parsedIds = ids.map((id) => (isNum && !isNaN(Number(id)) ? Number(id) : id));
+
+	const dbClient = db as any;
+	await dbClient.delete(table).where(inArray(pkCol, parsedIds));
+	return parsedIds.length;
 }

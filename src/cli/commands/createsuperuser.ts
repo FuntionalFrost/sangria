@@ -4,6 +4,7 @@ import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { eq } from 'drizzle-orm';
 import { user, account } from '../../lib/server/db/schema';
+import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
 
 export const createSuperuserCommand = defineCommand({
@@ -11,7 +12,21 @@ export const createSuperuserCommand = defineCommand({
 		name: 'createsuperuser',
 		description: 'Create a superadministrator account for the Sangria Admin panel'
 	},
-	async run() {
+	args: {
+		name: {
+			type: 'string',
+			description: 'Admin user name'
+		},
+		email: {
+			type: 'string',
+			description: 'Admin email'
+		},
+		password: {
+			type: 'string',
+			description: 'Admin password'
+		}
+	},
+	async run({ args }) {
 		p.intro('Sangria - Create Superuser');
 
 		const dbUrl =
@@ -19,26 +34,47 @@ export const createSuperuserCommand = defineCommand({
 		const client = postgres(dbUrl);
 		const db = drizzle(client);
 
-		const name = await p.text({
-			message: 'Enter admin name:',
-			placeholder: 'Admin',
-			validate: (val) => (!val ? 'Name is required' : undefined)
-		});
-		if (p.isCancel(name)) return;
+		let name = args.name;
+		if (!name) {
+			const promptName = await p.text({
+				message: 'Enter admin name:',
+				placeholder: 'Admin',
+				validate: (val) => (!val ? 'Name is required' : undefined)
+			});
+			if (p.isCancel(promptName)) {
+				await client.end();
+				return;
+			}
+			name = promptName;
+		}
 
-		const email = await p.text({
-			message: 'Enter admin email:',
-			placeholder: 'admin@sangria.local',
-			validate: (val) => (!val || !val.includes('@') ? 'Valid email is required' : undefined)
-		});
-		if (p.isCancel(email)) return;
+		let email = args.email;
+		if (!email) {
+			const promptEmail = await p.text({
+				message: 'Enter admin email:',
+				placeholder: 'admin@sangria.local',
+				validate: (val) => (!val || !val.includes('@') ? 'Valid email is required' : undefined)
+			});
+			if (p.isCancel(promptEmail)) {
+				await client.end();
+				return;
+			}
+			email = promptEmail;
+		}
 
-		const password = await p.password({
-			message: 'Enter admin password:',
-			validate: (val) =>
-				!val || val.length < 8 ? 'Password must be at least 8 characters' : undefined
-		});
-		if (p.isCancel(password)) return;
+		let password = args.password;
+		if (!password) {
+			const promptPassword = await p.password({
+				message: 'Enter admin password:',
+				validate: (val) =>
+					!val || val.length < 8 ? 'Password must be at least 8 characters' : undefined
+			});
+			if (p.isCancel(promptPassword)) {
+				await client.end();
+				return;
+			}
+			password = promptPassword;
+		}
 
 		const s = p.spinner();
 		s.start('Creating superuser account...');
@@ -69,17 +105,15 @@ export const createSuperuserCommand = defineCommand({
 				emailVerified: true
 			});
 
-			// Hash password using PBKDF2 / scrypt
-			const salt = crypto.randomBytes(16).toString('hex');
-			const hash = crypto.scryptSync(password as string, salt, 64).toString('hex');
-			const passwordHash = `${salt}:${hash}`;
+			// Hash password using Better-Auth scrypt hasher
+			const passwordHash = await hashPassword(password as string);
 
 			await db.insert(account).values({
 				id: accountId,
 				userId: userId,
-				accountId: email as string,
+				accountId: userId,
 				providerId: 'credential',
-				issuer: 'credential',
+				issuer: 'local:credential',
 				password: passwordHash
 			});
 

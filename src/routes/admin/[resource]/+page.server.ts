@@ -1,6 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { registry, fetchResourceList, deleteResourceItem } from '$lib/sangria';
+import { registry, fetchResourceList, deleteResourceItem, bulkDeleteResourceItems } from '$lib/sangria';
 import '$lib/server/admin/resources';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
@@ -32,14 +32,21 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 		}
 	}
 
-	const result = await fetchResourceList(resource, {
-		page,
-		perPage,
-		search,
-		sort,
-		order,
-		filters
-	});
+	let result = { items: [], total: 0, page: 1, perPage: 20, totalPages: 1 };
+	let dbError: string | null = null;
+
+	try {
+		result = await fetchResourceList(resource, {
+			page,
+			perPage,
+			search,
+			sort,
+			order,
+			filters
+		});
+	} catch (err: any) {
+		dbError = err?.message || 'Database error occurred. Make sure PostgreSQL is running.';
+	}
 
 	return {
 		resource: {
@@ -52,6 +59,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 			list: resource.list
 		},
 		data: result,
+		dbError,
 		query: {
 			page,
 			perPage,
@@ -81,6 +89,29 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (err: any) {
 			return fail(500, { error: err?.message || 'Failed to delete record' });
+		}
+	},
+	bulkDelete: async ({ params, request, locals }) => {
+		const resource = registry.getResource(params.resource);
+		if (!resource) return fail(404, { error: 'Resource not found' });
+
+		if (resource.permissions.delete && !resource.permissions.delete(locals.user)) {
+			return fail(403, { error: 'Permission denied' });
+		}
+
+		const formData = await request.formData();
+		const idsJson = formData.get('ids') as string;
+		if (!idsJson) return fail(400, { error: 'IDs are required' });
+
+		try {
+			const ids = JSON.parse(idsJson);
+			if (!Array.isArray(ids) || ids.length === 0) {
+				return fail(400, { error: 'Invalid IDs format' });
+			}
+			const count = await bulkDeleteResourceItems(resource, ids);
+			return { success: true, count };
+		} catch (err: any) {
+			return fail(500, { error: err?.message || 'Failed to bulk delete records' });
 		}
 	}
 };
