@@ -12,13 +12,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm and Node.js
-        uses: pnpm/setup@v1
+        uses: pnpm/setup@v2
         with:
           version: 11
-          runtime: node@22
+          runtime: node@26
           cache: true
 
       - name: Run svelte-check
